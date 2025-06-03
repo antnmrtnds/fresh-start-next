@@ -1,24 +1,15 @@
 
-// pages/index.js
 import { useState } from 'react';
-
-// Dashboard components
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { 
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '../components/ui/dropdown-menu';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { Badge } from '../components/ui/badge';
-import { Separator } from '../components/ui/separator';
-import { Loader2, Search, Building2, Globe, TrendingUp, BarChart3, Users, Activity } from 'lucide-react';
+import { SidebarProvider, SidebarTrigger } from '../src/components/ui/sidebar';
+import { AppSidebar } from '../src/components/AppSidebar';
+import { SearchForm } from '../src/components/SearchForm';
+import { MetricsCard } from '../src/components/MetricsCard';
+import { AnalysisChart } from '../src/components/AnalysisChart';
+import { ResultsDisplay } from '../src/components/ResultsDisplay';
+import { Alert, AlertDescription } from '../src/components/ui/alert';
+import { Badge } from '../src/components/ui/badge';
+import { Separator } from '../src/components/ui/separator';
+import { Building2, Users, Activity, BarChart3, Globe, TrendingUp, AlertCircle } from 'lucide-react';
 
 export default function Home() {
   const [company, setCompany] = useState('');
@@ -96,193 +87,102 @@ export default function Home() {
     }
   };
 
-  const countryNames = {
-    US: 'United States',
-    BR: 'Brazil', 
-    GB: 'United Kingdom',
-    PT: 'Portugal',
-    ES: 'Spain',
-    FR: 'France',
-    DE: 'Germany',
-    IT: 'Italy',
-    NL: 'Netherlands'
-  };
-
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      {/* Header */}
-      <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-6 w-6" />
-          <h1 className="text-xl font-semibold">UpSpy</h1>
-        </div>
-        <div className="ml-auto flex items-center gap-4">
-          <Badge variant="secondary">Dashboard</Badge>
-        </div>
-      </header>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-gray-50 to-white">
+        <AppSidebar />
+        
+        <main className="flex-1 flex flex-col min-h-screen">
+          {/* Header */}
+          <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-white/80 backdrop-blur-sm px-4 md:px-6">
+            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Competitive Intelligence Dashboard
+              </h1>
+            </div>
+            <div className="ml-auto flex items-center gap-4">
+              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                Live
+              </Badge>
+            </div>
+          </header>
 
-      {/* Main Content */}
-      <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
-        <div className="mx-auto grid w-full max-w-6xl gap-2">
-          <h1 className="text-3xl font-semibold">Competitor Analysis</h1>
-          <p className="text-muted-foreground">
-            Analyze advertising strategies and gain competitive intelligence insights.
-          </p>
-        </div>
+          {/* Main Content */}
+          <div className="flex-1 flex flex-col gap-6 p-6">
+            {/* Quick Stats Overview */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <MetricsCard
+                title="Search Status"
+                value={loading ? 'Active' : results ? 'Complete' : 'Ready'}
+                description={loading ? 'Processing request...' : results ? 'Analysis finished' : 'Ready to search'}
+                icon={Activity}
+                trend={results ? { value: '+100%', type: 'up' } : undefined}
+              />
+              
+              <MetricsCard
+                title="Target Company"
+                value={company || 'None'}
+                description={country ? `Market: ${country}` : 'No market selected'}
+                icon={Building2}
+              />
+              
+              <MetricsCard
+                title="Intelligence Status"
+                value={results ? 'Available' : 'Pending'}
+                description="Competitive insights"
+                icon={BarChart3}
+                trend={results ? { value: 'Ready', type: 'up' } : undefined}
+              />
+              
+              <MetricsCard
+                title="Market Coverage"
+                value="9 Countries"
+                description="Global analysis available"
+                icon={Globe}
+                trend={{ value: '+2 new', type: 'up' }}
+              />
+            </div>
 
-        <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
-          {/* Sidebar Navigation */}
-          <nav className="grid gap-4 text-sm text-muted-foreground">
-            <Badge variant="outline" className="justify-center">
-              Advertising Intelligence
-            </Badge>
-          </nav>
+            <Separator className="my-2" />
 
-          {/* Main Dashboard Grid */}
-          <div className="grid gap-6">
             {/* Search Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Search className="h-5 w-5" />
-                  Search Company
-                </CardTitle>
-                <CardDescription>
-                  Enter company details to analyze their advertising strategy
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="company" className="flex items-center gap-1">
-                        <Building2 className="h-4 w-4" />
-                        Company Name
-                      </Label>
-                      <Input
-                        id="company"
-                        type="text"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
-                        placeholder="Ex: CivilRia, Vizta.pt..."
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-1">
-                        <Globe className="h-4 w-4" />
-                        Target Country
-                      </Label>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="w-full justify-between">
-                            {country ? countryNames[country] : 'Select country...'}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full">
-                          <DropdownMenuLabel>Select a country</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onSelect={() => setCountry('US')}>United States</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('BR')}>Brazil</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('GB')}>United Kingdom</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('PT')}>Portugal</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('ES')}>Spain</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('FR')}>France</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('DE')}>Germany</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('IT')}>Italy</DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => setCountry('NL')}>Netherlands</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loading ? 'Analyzing...' : 'Start Analysis'}
-                  </Button>
-                </form>
+            <div className="grid gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
+                <SearchForm
+                  company={company}
+                  setCompany={setCompany}
+                  country={country}
+                  setCountry={setCountry}
+                  loading={loading}
+                  onSubmit={handleSubmit}
+                />
 
                 {/* Error Message */}
                 {error && (
-                  <Alert variant="destructive" className="mt-4">
-                    <AlertDescription>{error}</AlertDescription>
+                  <Alert variant="destructive" className="mt-4 border-red-200 bg-red-50">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-red-800">{error}</AlertDescription>
                   </Alert>
                 )}
-              </CardContent>
-            </Card>
-
-            {/* Status Overview Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Search Status</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {loading ? 'Active' : results ? 'Complete' : 'Ready'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {loading ? 'Processing request...' : results ? 'Analysis finished' : 'Ready to search'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Target Company</CardTitle>
-                  <Building2 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {company || 'None'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    {country ? countryNames[country] : 'No country selected'}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Intelligence</CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {results ? 'Available' : 'Pending'}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Competitive insights
-                  </p>
-                </CardContent>
-              </Card>
+              </div>
+              
+              <div className="lg:col-span-1">
+                <AnalysisChart />
+              </div>
             </div>
 
             {/* Results Section */}
             {results && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Analysis Results
-                  </CardTitle>
-                  <CardDescription>
-                    Advertising intelligence data for {company} {country && `in ${countryNames[country]}`}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="rounded-md bg-muted p-4 overflow-auto max-h-96">
-                    <pre className="text-sm">
-                      {JSON.stringify(results, null, 2)}
-                    </pre>
-                  </div>
-                </CardContent>
-              </Card>
+              <ResultsDisplay
+                results={results}
+                company={company}
+                country={country}
+              />
             )}
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
