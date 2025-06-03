@@ -1,3 +1,4 @@
+
 // pages/index.js
 import { useState } from 'react';
 
@@ -17,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Badge } from '../components/ui/badge';
 import { Separator } from '../components/ui/separator';
-import { Loader2, Search, Building2, Globe, TrendingUp } from 'lucide-react';
+import { Loader2, Search, Building2, Globe, TrendingUp, BarChart3, Users, Activity } from 'lucide-react';
 
 export default function Home() {
   const [company, setCompany] = useState('');
@@ -108,161 +109,180 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen w-full flex-col">
       {/* Header */}
-      <div className="border-b">
-        <div className="flex h-16 items-center px-4">
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-6 w-6" />
-            <h1 className="text-2xl font-bold">UpSpy</h1>
-          </div>
-          <div className="ml-auto flex items-center space-x-4">
-            <Badge variant="secondary">Dashboard</Badge>
-          </div>
+      <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-6 w-6" />
+          <h1 className="text-xl font-semibold">UpSpy</h1>
         </div>
-      </div>
-
-      {/* Main Dashboard */}
-      <div className="flex-1 space-y-4 p-8 pt-6">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Competitor Analysis</h2>
-          <div className="flex items-center space-x-2">
-            <Badge variant="outline">Advertising Intelligence</Badge>
-          </div>
+        <div className="ml-auto flex items-center gap-4">
+          <Badge variant="secondary">Dashboard</Badge>
         </div>
-        
-        <Separator />
+      </header>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {/* Search Card */}
-          <Card className="col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Search className="h-5 w-5" />
-                <span>Search Company</span>
-              </CardTitle>
-              <CardDescription>
-                Enter company details to analyze their advertising strategy
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid gap-4 grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="company" className="flex items-center space-x-1">
-                      <Building2 className="h-4 w-4" />
-                      <span>Company Name</span>
-                    </Label>
-                    <Input
-                      id="company"
-                      type="text"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      placeholder="Ex: CivilRia, Vizta.pt..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="flex items-center space-x-1">
-                      <Globe className="h-4 w-4" />
-                      <span>Target Country</span>
-                    </Label>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full justify-between">
-                          {country ? countryNames[country] : 'Select country...'}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-full">
-                        <DropdownMenuLabel>Select a country</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onSelect={() => setCountry('US')}>United States</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('BR')}>Brazil</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('GB')}>United Kingdom</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('PT')}>Portugal</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('ES')}>Spain</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('FR')}>France</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('DE')}>Germany</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('IT')}>Italy</DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => setCountry('NL')}>Netherlands</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {loading ? 'Analyzing...' : 'Start Analysis'}
-                </Button>
-              </form>
-
-              {/* Error Message */}
-              {error && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Status Cards */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Search Status</CardTitle>
-                <Search className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {loading ? 'Active' : results ? 'Complete' : 'Ready'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {loading ? 'Processing request...' : results ? 'Analysis finished' : 'Ready to search'}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Target</CardTitle>
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {company || 'None'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {country ? countryNames[country] : 'No country selected'}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+      {/* Main Content */}
+      <main className="flex min-h-[calc(100vh_-_theme(spacing.16))] flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
+        <div className="mx-auto grid w-full max-w-6xl gap-2">
+          <h1 className="text-3xl font-semibold">Competitor Analysis</h1>
+          <p className="text-muted-foreground">
+            Analyze advertising strategies and gain competitive intelligence insights.
+          </p>
         </div>
 
-        {/* Results Section */}
-        {results && (
-          <div className="grid gap-4">
+        <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[180px_1fr] lg:grid-cols-[250px_1fr]">
+          {/* Sidebar Navigation */}
+          <nav className="grid gap-4 text-sm text-muted-foreground">
+            <Badge variant="outline" className="justify-center">
+              Advertising Intelligence
+            </Badge>
+          </nav>
+
+          {/* Main Dashboard Grid */}
+          <div className="grid gap-6">
+            {/* Search Section */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5" />
-                  <span>Analysis Results</span>
+                <CardTitle className="flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  Search Company
                 </CardTitle>
                 <CardDescription>
-                  Advertising intelligence data for {company} {country && `in ${countryNames[country]}`}
+                  Enter company details to analyze their advertising strategy
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md bg-muted p-4 overflow-auto max-h-96">
-                  <pre className="text-sm">
-                    {JSON.stringify(results, null, 2)}
-                  </pre>
-                </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="company" className="flex items-center gap-1">
+                        <Building2 className="h-4 w-4" />
+                        Company Name
+                      </Label>
+                      <Input
+                        id="company"
+                        type="text"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        placeholder="Ex: CivilRia, Vizta.pt..."
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-1">
+                        <Globe className="h-4 w-4" />
+                        Target Country
+                      </Label>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="w-full justify-between">
+                            {country ? countryNames[country] : 'Select country...'}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-full">
+                          <DropdownMenuLabel>Select a country</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onSelect={() => setCountry('US')}>United States</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('BR')}>Brazil</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('GB')}>United Kingdom</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('PT')}>Portugal</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('ES')}>Spain</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('FR')}>France</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('DE')}>Germany</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('IT')}>Italy</DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => setCountry('NL')}>Netherlands</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {loading ? 'Analyzing...' : 'Start Analysis'}
+                  </Button>
+                </form>
+
+                {/* Error Message */}
+                {error && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
               </CardContent>
             </Card>
+
+            {/* Status Overview Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Search Status</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {loading ? 'Active' : results ? 'Complete' : 'Ready'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {loading ? 'Processing request...' : results ? 'Analysis finished' : 'Ready to search'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Target Company</CardTitle>
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {company || 'None'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {country ? countryNames[country] : 'No country selected'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Intelligence</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {results ? 'Available' : 'Pending'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Competitive insights
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Results Section */}
+            {results && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Analysis Results
+                  </CardTitle>
+                  <CardDescription>
+                    Advertising intelligence data for {company} {country && `in ${countryNames[country]}`}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-md bg-muted p-4 overflow-auto max-h-96">
+                    <pre className="text-sm">
+                      {JSON.stringify(results, null, 2)}
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
